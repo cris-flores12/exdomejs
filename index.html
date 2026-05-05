@@ -1,88 +1,246 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-  <!-- Define o padrão de caracteres da página -->
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lógica de Jogo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1f2937, #111827);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-  <!-- Deixa a página adaptável para celular e computador -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
 
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
 
-  <!-- Título que aparece na aba do navegador -->
-  <title>Quebra-Cabeça Interativo</title>
+    p {
+      text-align: center;
+      margin-bottom: 18px;
+      color: #d1d5db;
+    }
 
+    .painel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+    }
 
-  <!-- Conecta o arquivo CSS ao HTML -->
-  <link rel="stylesheet" href="css/style.css">
+    .info {
+      font-size: 1rem;
+      color: #e5e7eb;
+    }
+
+    .mensagem {
+      min-height: 24px;
+      font-weight: bold;
+      color: #fbbf24;
+    }
+
+    .tabuleiro {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .peca {
+      aspect-ratio: 1;
+      border: none;
+      border-radius: 16px;
+      background: #374151;
+      color: white;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.25s;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08);
+    }
+
+    .peca:hover {
+      transform: translateY(-3px);
+      background: #4b5563;
+    }
+
+    .peca.ativa {
+      background: #22c55e;
+      color: #052e16;
+      font-weight: bold;
+      transform: scale(1.02);
+    }
+
+    .peca.bloqueada {
+      opacity: 0.85;
+    }
+
+    .acoes {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .botao {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .resetar {
+      background: #ef4444;
+      color: white;
+    }
+
+    .resetar:hover {
+      background: #dc2626;
+    }
+
+    .limpar-mensagem {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .limpar-mensagem:hover {
+      background: #2563eb;
+    }
+
+    .rodape {
+      margin-top: 18px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+  </style>
 </head>
 <body>
-
-
-  <!-- Área principal da página -->
   <main class="container">
+    <h1>Lógica de Jogo</h1>
+    <p>Ative as peças respeitando o limite e tente vencer.</p>
 
-
-    <!-- Cabeçalho da página -->
-    <section class="hero">
-      <p class="tag">Programação Website I</p>
-
-
-      <h1>Quebra-Cabeça Interativo</h1>
-
-
-      <p class="descricao">
-        Nesta aula vamos criar a primeira peça interativa usando HTML, CSS e JavaScript.
-      </p>
+    <section class="painel">
+      <div class="info">Peças ativas: <span id="contadorAtivas">0</span></div>
+      <div id="mensagem" class="mensagem" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>
 
-
-    <!-- Área onde ficará o projeto -->
-    <section class="area-projeto">
-
-
-      <!-- Card com informações e botão -->
-      <div class="card-info">
-        <h2>Peça 01</h2>
-
-
-        <p>
-          Clique no botão para ativar a primeira peça do projeto.
-        </p>
-
-
-        <!-- Área que mostra o status da peça -->
-        <div class="status-box">
-          <span>Status:</span>
-          <strong id="statusTexto">Bloqueada</strong>
-        </div>
-
-
-        <!-- Botão que será usado pelo JavaScript -->
-        <button id="btnAtivar" class="btn-principal">
-          Ativar Peça
-        </button>
-      </div>
-
-
-      <!-- Peça visual do quebra-cabeça -->
-      <div id="peca" class="peca bloqueada">
-        <div class="peca-conteudo">
-          <span id="iconePeca" class="icone">🔒</span>
-          <h3 id="tituloPeca">Peça Bloqueada</h3>
-          <p id="textoPeca">Aguardando interação...</p>
-        </div>
-      </div>
-
-
+    <section class="tabuleiro" id="tabuleiro">
+      <button class="peca" type="button">1</button>
+      <button class="peca" type="button">2</button>
+      <button class="peca" type="button">3</button>
+      <button class="peca" type="button">4</button>
+      <button class="peca" type="button">5</button>
+      <button class="peca" type="button">6</button>
+      <button class="peca" type="button">7</button>
+      <button class="peca" type="button">8</button>
     </section>
 
+    <div class="acoes">
+      <button id="resetar" class="botao resetar" type="button">Resetar</button>
+      <button id="limparMensagem" class="botao limpar-mensagem" type="button">Limpar Mensagem</button>
+    </div>
 
+    <div class="rodape">
+      Desafio: ative todas as peças para vencer.
+    </div>
   </main>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const pecas = document.querySelectorAll(".peca");
+      const contadorAtivas = document.getElementById("contadorAtivas");
+      const mensagem = document.getElementById("mensagem");
+      const botaoResetar = document.getElementById("resetar");
+      const botaoLimparMensagem = document.getElementById("limparMensagem");
 
-  <!-- Conecta o JavaScript ao HTML -->
-  <script src="script/script.js"></script>
+      const LIMITE = 3;
+
+      function atualizarContador() {
+        const ativas = document.querySelectorAll(".peca.ativa");
+        contadorAtivas.innerText = ativas.length;
+
+        if (ativas.length === pecas.length) {
+          mensagem.innerText = "Você venceu!";
+        }
+      }
+
+      function verificarLimite(peca) {
+        const ativas = document.querySelectorAll(".peca.ativa");
+
+        if (ativas.length >= LIMITE && !peca.classList.contains("ativa")) {
+          mensagem.innerText = "Limite atingido!";
+          return false;
+        }
+
+        return true;
+      }
+
+      function ativarPeca(peca) {
+        peca.classList.toggle("ativa");
+        peca.classList.toggle("bloqueada");
+      }
+
+      pecas.forEach(function (peca) {
+        peca.addEventListener("click", function () {
+          if (!verificarLimite(peca)) {
+            return;
+          }
+
+          ativarPeca(peca);
+          mensagem.innerText = "";
+          atualizarContador();
+        });
+      });
+
+      botaoResetar.addEventListener("click", function () {
+        pecas.forEach(function (peca) {
+          peca.classList.remove("ativa");
+          peca.classList.remove("bloqueada");
+        });
+
+        mensagem.innerText = "";
+        atualizarContador();
+      });
+
+      botaoLimparMensagem.addEventListener("click", function () {
+        mensagem.innerText = "";
+      });
+
+      atualizarContador();
+    });
+  </script>
 </body>
 </html>
